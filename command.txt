@@ -1,0 +1,23 @@
+python demo/video_demo.py \
+    /home/chenxin/dataset/2023-11-28-11-47-53.mkv \
+    configs/ssd/ssdlite_mobilenetv2-scratch_8xb24-600e_coco.py \
+    downloads/ssdlite_mobilenetv2_scratch_600e_coco_20210629_110627-974d9307.pth \
+    --device cuda:1 \
+    --out outputs/2023-11-28-11-47-53.mp4
+
+    [--wait-time ${WAIT_TIME}] \
+    [--score-thr ${SCORE_THR}] \
+
+
+# https://mmdetection.readthedocs.io/zh-cn/latest/user_guides/train.html#id8 
+CUDA_VISIBLE_DEVICES=1 python tools/train.py \
+    /home/chenxin/repo/mmdetection/configs/faster_rcnn/faster-rcnn_r50_fpn_2xb16_1x_cityscapes.py\
+    --auto-scale-lr
+
+CUDA_VISIBLE_DEVICES=2,3 ./tools/dist_train.sh \
+    /home/chenxin/repo/mmdetection/configs/faster_rcnn/faster-rcnn_r50_fpn_2xb16_1x_cityscapes.py\
+    2 \
+    --auto-scale-lr
+
+python tools/train.py configs/balloon/mask-rcnn_r50-caffe_fpn_ms-poly-1x_balloon.py
+python tools/test.py configs/balloon/mask-rcnn_r50-caffe_fpn_ms-poly-1x_balloon.py work_dirs/mask-rcnn_r50-caffe_fpn_ms-poly-1x_balloon/epoch_12.pth
